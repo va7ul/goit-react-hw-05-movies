@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchMovieCast } from 'api';
-import { Loader } from 'components/Loader';
 
 const defaultImg =
   '<https://ireland.apollo.olxcdn.com/v1/files/0iq0gb9ppip8-UA/image;s=1000x700>';
@@ -9,7 +8,7 @@ const defaultImg =
 const Cast = () => {
   const { movieId } = useParams();
   const [cast, setCast] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     if (!movieId) {
@@ -18,21 +17,27 @@ const Cast = () => {
 
     async function getCast() {
       try {
-        setLoading(true);
+        setError(false);
+
         const cast = await fetchMovieCast(movieId);
-        setCast(cast);
+
+        if (cast.length) {
+          setCast(cast);
+        }
       } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
+        if (error.code !== 'ERR_CANCELED') {
+          setError(true);
+        }
       }
     }
 
     getCast();
   }, [movieId]);
 
-  return loading ? (
-    <Loader />
+  return error ? (
+    <p style={{ color: 'red' }}>
+      Sorry! There was an error! Please try refreshing the page!
+    </p>
   ) : cast.length > 0 ? (
     <div>
       <ul>

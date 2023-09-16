@@ -9,6 +9,7 @@ const MoviesPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchMovies, setSearchMovies] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   const query = searchParams.get('query') ?? '';
 
@@ -19,6 +20,7 @@ const MoviesPage = () => {
 
     async function getSearchMovies() {
       try {
+        setError(false);
         setLoading(true);
         const movies = await fetchSearchMovies(query);
 
@@ -30,7 +32,10 @@ const MoviesPage = () => {
 
         setSearchMovies(movies);
       } catch (error) {
-        console.log(error);
+        
+        if (error.code !== 'ERR_CANCELED') {
+          setError(true);
+        }
       } finally {
         setLoading(false);
       }
@@ -60,6 +65,11 @@ const MoviesPage = () => {
         <input type="text" name="query" required />
         <button type="submit">Search</button>
       </form>
+      {error && (
+        <p style={{ color: 'red' }}>
+          Sorry! There was an error! Please try refreshing the page!
+        </p>
+      )}
       {loading ? <Loader /> : <SearchMovies movies={searchMovies} />}
       <Toaster />
     </div>

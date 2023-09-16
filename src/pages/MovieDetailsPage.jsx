@@ -8,7 +8,7 @@ import { Loader } from 'components/Loader';
 const MoviesDetailsPage = () => {
   const { movieId } = useParams();
   const [movieDetails, setMovieDetails] = useState({});
-  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     if (!movieId) {
@@ -17,21 +17,27 @@ const MoviesDetailsPage = () => {
 
     async function getMovieDetails() {
       try {
-        setLoading(true);
+        setError(false);
+
         const movie = await fetchMovieDetails(movieId);
-        setMovieDetails(movie);
+
+        if (movie.id) {
+          setMovieDetails(movie);
+        }
       } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
+        if (error.code !== 'ERR_CANCELED') {
+          setError(true);
+        }
       }
     }
 
     getMovieDetails();
   }, [movieId]);
 
-  return loading ? (
-    <Loader />
+  return error ? (
+    <p style={{ color: 'red' }}>
+      Sorry! There was an error! Please try refreshing the page!
+    </p>
   ) : (
     <div>
       <AboutMovie movieDetails={movieDetails} />
@@ -43,7 +49,7 @@ const MoviesDetailsPage = () => {
           <Link to="reviews">Reviews</Link>
         </li>
       </ul>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<Loader />}>
         <Outlet />
       </Suspense>
     </div>

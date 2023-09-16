@@ -1,29 +1,38 @@
 import { useState, useEffect } from 'react';
 import { fetchTrendingMovies } from '../api';
 import { TrendingMovies } from 'components/TrendingMovies/TrendingMovies';
-import { Loader } from 'components/Loader';
 
 const HomePage = () => {
   const [trendingMovies, setTrendingMovies] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     async function getTrendingMovies() {
       try {
-        setLoading(true);
+        setError(false);
+
         const movies = await fetchTrendingMovies();
-        setTrendingMovies(movies);
+
+        if (movies.length) {
+          setTrendingMovies(movies);
+        }
       } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
+        if (error.code !== 'ERR_CANCELED') {
+          setError(true);
+        }
       }
     }
 
     getTrendingMovies();
   }, []);
 
-  return loading ? <Loader /> : <TrendingMovies movies={trendingMovies} />;
+  return error ? (
+    <p style={{ color: 'red' }}>
+      Sorry! There was an error! Please try refreshing the page!
+    </p>
+  ) : (
+    <TrendingMovies movies={trendingMovies} />
+  );
 };
 
 export default HomePage;

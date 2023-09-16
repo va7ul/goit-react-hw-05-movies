@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchMovieReviews } from 'api';
-import { Loader } from 'components/Loader';
 
 const Reviews = () => {
   const { movieId } = useParams();
   const [reviews, setReviews] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     if (!movieId) {
@@ -15,19 +14,27 @@ const Reviews = () => {
 
     async function getReviews() {
       try {
-        setLoading(true);
+        setError(false);
+
         const reviews = await fetchMovieReviews(movieId);
-        setReviews(reviews);
+
+        if (reviews.length) {
+          setReviews(reviews);
+        }
       } catch (error) {
-        console.log(error);
+        if (error.code !== 'ERR_CANCELED') {
+          setError(true);
+        }
       }
     }
 
     getReviews();
   }, [movieId]);
 
-  return loading ? (
-    <Loader />
+  return error ? (
+    <p style={{ color: 'red' }}>
+      Sorry! There was an error! Please try refreshing the page!
+    </p>
   ) : reviews.length > 0 ? (
     <div>
       <ul>
