@@ -1,12 +1,14 @@
 import { Link, Outlet } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchMovieDetails } from 'api';
 import { AboutMovie } from 'components/AboutMovie/AboutMovie';
+import { Loader } from 'components/Loader';
 
 const MoviesDetailsPage = () => {
   const { movieId } = useParams();
   const [movieDetails, setMovieDetails] = useState({});
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!movieId) {
@@ -15,31 +17,36 @@ const MoviesDetailsPage = () => {
 
     async function getMovieDetails() {
       try {
+        setLoading(true);
         const movie = await fetchMovieDetails(movieId);
         setMovieDetails(movie);
       } catch (error) {
         console.log(error);
+      } finally {
+        setLoading(false);
       }
     }
 
     getMovieDetails();
   }, [movieId]);
 
-  return (
-    <>
+  return loading ? (
+    <Loader />
+  ) : (
+    <div>
       <AboutMovie movieDetails={movieDetails} />
-      <div>
-        <ul>
-          <li>
-            <Link to="cast">Cast</Link>
-          </li>
-          <li>
-            <Link to="reviews">Reviews</Link>
-          </li>
-        </ul>
+      <ul>
+        <li>
+          <Link to="cast">Cast</Link>
+        </li>
+        <li>
+          <Link to="reviews">Reviews</Link>
+        </li>
+      </ul>
+      <Suspense fallback={<div>Loading...</div>}>
         <Outlet />
-      </div>
-    </>
+      </Suspense>
+    </div>
   );
 };
 

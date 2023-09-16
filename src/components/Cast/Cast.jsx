@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchMovieCast } from 'api';
+import { Loader } from 'components/Loader';
 
 const defaultImg =
   '<https://ireland.apollo.olxcdn.com/v1/files/0iq0gb9ppip8-UA/image;s=1000x700>';
 
-export const Cast = () => {
+const Cast = () => {
   const { movieId } = useParams();
   const [cast, setCast] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!movieId) {
@@ -16,17 +18,22 @@ export const Cast = () => {
 
     async function getCast() {
       try {
+        setLoading(true);
         const cast = await fetchMovieCast(movieId);
         setCast(cast);
       } catch (error) {
         console.log(error);
+      } finally {
+        setLoading(false);
       }
     }
 
     getCast();
   }, [movieId]);
 
-  return cast.length > 0 ? (
+  return loading ? (
+    <Loader />
+  ) : cast.length > 0 ? (
     <div>
       <ul>
         {cast.map(({ id, name, character, profile_path }) => (
@@ -50,3 +57,5 @@ export const Cast = () => {
     `We don't have any cast for this movie.`
   );
 };
+
+export default Cast;
