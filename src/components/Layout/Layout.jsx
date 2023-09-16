@@ -11,7 +11,7 @@ const StyledLink = styled(NavLink)`
 
 export const Layout = () => {
   return (
-    <div>
+    <>
       <header>
         <nav>
           <ul>
@@ -27,6 +27,6 @@ export const Layout = () => {
       <main>
         <Outlet />
       </main>
-    </div>
+    </>
   );
 };

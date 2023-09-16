@@ -17,10 +17,9 @@ async function fetchTrendingMovies() {
 async function fetchSearchMovies(query) {
   try {
     const response = await axios.get(
-      `/3/search/movie/query=${query}?api_key=${API_KEY}`
+      `/3/search/movie?query=${query}&api_key=${API_KEY}`
     );
-    console.log(response.data);
-    return response.data;
+    return response.data.results;
   } catch (error) {
     console.log(error);
   }

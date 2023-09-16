@@ -1,37 +1,19 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { fetchMovieDetails } from 'api';
+import { useRef } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
 const defaultImg =
   'https://ireland.apollo.olxcdn.com/v1/files/0iq0gb9ppip8-UA/image;s=1000x700';
 
-export const AboutMovie = () => {
-  const { movieId } = useParams();
-  const [movieDetails, setMovieDetails] = useState({});
-
-  useEffect(() => {
-    if (!movieId) {
-      return;
-    }
-
-    async function getMovieDetails() {
-      try {
-        const movie = await fetchMovieDetails(movieId);
-        setMovieDetails(movie);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    getMovieDetails();
-  }, [movieId]);
+export const AboutMovie = ({ movieDetails }) => {
+  const location = useLocation();
+  const backLinkHref = useRef(location.state?.from ?? '/movies');
 
   const { id, poster_path, title, vote_average, overview, genres } =
     movieDetails;
 
   return (
     <div>
-      <button>Go back</button>
+      <Link to={backLinkHref.current}>Go back</Link>
       {movieDetails ? (
         <div>
           <ul>
@@ -46,7 +28,7 @@ export const AboutMovie = () => {
                 alt={title}
               />
               <h3>{title}</h3>
-              <div>User score: {vote_average}</div>
+              <div>User score: {Math.round(vote_average * 100) / 100}</div>
               <div>
                 Overview
                 <br />
@@ -62,7 +44,7 @@ export const AboutMovie = () => {
           </ul>
         </div>
       ) : (
-        `We don't have any cast for this movie.`
+        `Oppsss! Something went wrong!`
       )}
     </div>
   );
