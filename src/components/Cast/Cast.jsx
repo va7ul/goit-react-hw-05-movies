@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchMovieCast } from 'api';
+import { List, Image } from './Cast.styled';
 
 const defaultImg =
-  '<https://ireland.apollo.olxcdn.com/v1/files/0iq0gb9ppip8-UA/image;s=1000x700>';
+  'https://ireland.apollo.olxcdn.com/v1/files/0iq0gb9ppip8-UA/image;s=1000x700';
 
 const Cast = () => {
   const { movieId } = useParams();
@@ -40,10 +41,11 @@ const Cast = () => {
     </p>
   ) : cast.length > 0 ? (
     <div>
-      <ul>
+      <hr />
+      <List>
         {cast.map(({ id, name, character, profile_path }) => (
           <li key={id}>
-            <img
+            <Image
               src={
                 profile_path
                   ? `https://image.tmdb.org/t/p/w500/${profile_path}`
@@ -52,11 +54,13 @@ const Cast = () => {
               width={250}
               alt={name}
             />
-            <h3>{name}</h3>
-            <div>{character}</div>
+            <div>
+              <h3>{name}</h3>
+              <p>{character}</p>
+            </div>
           </li>
         ))}
-      </ul>
+      </List>
     </div>
   ) : (
     `We don't have any cast for this movie.`

@@ -4,6 +4,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import { fetchSearchMovies } from 'api';
 import { SearchMovies } from 'components/SearchMovies/SearchMovies';
 import { Loader } from 'components/Loader';
+import { SearchForm } from 'components/SearchForm/SearchForm';
 
 const MoviesPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -32,7 +33,6 @@ const MoviesPage = () => {
 
         setSearchMovies(movies);
       } catch (error) {
-        
         if (error.code !== 'ERR_CANCELED') {
           setError(true);
         }
@@ -61,10 +61,7 @@ const MoviesPage = () => {
 
   return (
     <div>
-      <form onSubmit={getSearchQuery}>
-        <input type="text" name="query" required />
-        <button type="submit">Search</button>
-      </form>
+      <SearchForm getSearchQuery={getSearchQuery} />
       {error && (
         <p style={{ color: 'red' }}>
           Sorry! There was an error! Please try refreshing the page!
